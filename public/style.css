@@ -1,0 +1,82 @@
+* {
+  margin: 0;
+  padding: 0;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  color: #3c4043;
+  outline: none;
+  text-decoration: none;
+  line-break: break-all;
+}
+.container {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.inlinecontainer, .logo {
+  display: inline-block;
+}
+.navigator {
+  display: inline-block;
+}
+.logo {
+  display: block;
+  width: 150px;
+  height: 50px;
+  margin: 15px 30px;
+}
+.buttoncontainer {
+  display: inline-block;
+  float: right;
+}
+button {
+  display: block;
+  margin: 50px;
+}
+button:active, input:active, button:focus, input:focus, textarea:active, textarea:focus {
+  border: 1.5px solid #4F91FE;
+  border-width: 1.5px;
+  margin: 3.5px;
+}
+button, input, textarea {
+  text-decoration: none;
+  background-color: white;
+  -webkit-transition-duration: 0.4s;
+  transition-duration: 0.4s;
+  padding: 12px 20px;
+  font-size: 15px;
+  margin: 5px;
+  border: 0px solid #4F91FE;
+  overflow: hidden;
+  position: relative;
+  border-radius: 3px;
+  border-width: 0px;
+  cursor: pointer;
+}
+button:hover, input:hover {
+  background-color: #F4F4F4;
+}
+button:focus, button:active {
+  background-color: #E0E0E0;
+}
+button .ripple {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #000;
+  transform: scale(2.5);
+  opacity: 0.16;
+  position: absolute;
+  animation: ripple 0.4s linear;
+}
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.16;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
