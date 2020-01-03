@@ -10,9 +10,13 @@ app.get('/', function (req, res) {
   res.render('home');
 });
 
+app.get('/supports', function (req, res) {
+  res.render('supports');
+});
+
 app.get('*', function (req, res) {
   res.render('error', { message: '404 Not Found' });
-})
+});
 
 var port = process.env.PORT || 3000
 app.listen(port, function () {

@@ -3,10 +3,17 @@
   <head>
     <%- partial('header') %>
   </head>
-  <body>
-    <div class="container">
-      <div style="margin: 50px;"><label style="color: #d93025;"><%= message %></label></div><br></br>
-      <a href="/"><button type="button">Home</button></a>
+  <body style="display: table; position: absolute; top: 0; left: 0;">
+    <div style="display: table-cell; vertical-align: middle;">
+      <div class="errorContainer">
+        <div>
+          <div style="text-align: center; position: relative; top: 50px;"><label style="color: #d93025;"><%= message %></label></div><br></br>
+          <div style="display: inline-block; text-align: center; position: relative; top: 350px; left: 157px;">
+              <a href="javascript:history.back()"><button type="button">돌아가기</button></a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <script type="text/javascript" src="/js/master.js"></script>
   </body>
