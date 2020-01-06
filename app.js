@@ -6,6 +6,20 @@ var session = require('express-session');
 var flash = require('connect-flash');
 var async = require('async');
 
+mongoose.set('useCreateIndex', true);
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useUnifiedTopology', true);
+mongoose.connect(process.env.MODUI_DB);
+var db = mongoose.connection;
+
+db.once('open', function () {
+  console.log('DB connected');
+});
+
+db.on('error', function (err) {
+  console.log('DB error: ', err);
+})
+
 var userSchema = mongoose.Schema({
   username: { type: String, required: true, unique: true},
   name: { type: String, required: true },
@@ -13,13 +27,14 @@ var userSchema = mongoose.Schema({
   password: { type: String, required: true },
   createdAt: { type: Date, default: Date.now }
 });
+var User = mongoose.model('user', userSchema);
 
 var app = express();
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
 app.use(partials());
 app.use(flash());
-app.use(session({ secret: 'ModuiSecret34305068336758463823817899919446' }));
+app.use(session({ secret: process.env.MODUI_SECRET, resave: true, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -34,7 +49,7 @@ passport.deserializeUser(function (id, done) {
 });
 
 var LocalStrategy = require('passport-local').Strategy;
-passport.user('local-login',
+passport.use('local-login',
   new LocalStrategy({
     usernameField: 'username',
     passwordField: 'password',
@@ -63,7 +78,7 @@ app.get('/login', function (req, res) {
 app.post('/login', function (req, res, next) {
   req.flash('usrname');
   if (req.body.username.length === 0 || req.body.password.length === 0) {
-    req.flash('username', req.body.email);
+    req.flash('username', req.body.username);
     req.flash('loginError', 'No user found');
     res.redirect('/login');
   } else next();
@@ -76,7 +91,28 @@ app.post('/login', function (req, res, next) {
 app.get('/logout', function (req, res) {
   req.logout();
   res.redirect('/');
-})
+});
+
+app.get('/users/new', function (req, res) {
+  res.render('users/new', {
+    formData: req.flash('formData')[0],
+    loginError: req.flash('loginError')[0]
+  });
+});
+
+app.post('/users', checkUserRegValidation, function (req, res, next) {
+  User.create(req.body.user), function (err, user) {
+    if (err) return res.json({ success: false, message: err });
+    res.redirect('/login');
+  }
+});
+
+app.get('/users/:id', function (req, res) {
+  User.findById(req.params.id, function (err, user) {
+    if (err) return res.json({ success: false, message: err });
+    res.render('users/show', { user: user });
+  });
+});
 
 app.get('/supports', function (req, res) {
   res.render('supports');
@@ -90,3 +126,31 @@ var port = process.env.PORT || 3000
 app.listen(port, function () {
   console.log('Server On');
 });
+
+function checkUserRegValidation(req, res, next) {
+  var isValid = true;
+  async.waterfall([function (callback) {
+    User.findOne({ username: req.body.user.username, _id: { $ne: mongoose.Types.ObjectId(req.params.id) } }, function (err, user) {
+      if (user) {
+        isValid = false;
+        req.flash('registerError', 'Someone is already using the username');
+      }
+      callback(null, isValid);
+    });
+  }, function (isValid, callback) {
+    User.findOne({ email: req.body.user.email, _id: { $ne: mongoose.Types.ObjectId(req.params.id) } }, function (err, user) {
+      if (user) {
+        isValid = false;
+        req.flash('registerError', 'Someone is already using the email');
+      }
+      callback(null, isValid);
+    });
+  }], function (err, isValid) {
+    if (err) return res.json({ success: 'false', message: err });
+    if (isValid) return next();
+    else {
+      req.flahs('formData', req.body.user);
+      res.redirect('back');
+    }
+  });
+};
