@@ -5,6 +5,7 @@ var passport = require('passport');
 var session = require('express-session');
 var flash = require('connect-flash');
 var async = require('async');
+var bodyParser = require('body-parser');
 
 mongoose.set('useCreateIndex', true);
 mongoose.set('useNewUrlParser', true);
@@ -37,6 +38,8 @@ app.use(flash());
 app.use(session({ secret: process.env.MODUI_SECRET, resave: true, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 passport.serializeUser(function (user, done) {
   done(null, user.id);
@@ -72,11 +75,11 @@ app.get('/', function (req, res) {
 
 app.get('/login', function (req, res) {
   if (req.body.user) res.redirect('/');
-  else res.render('login/login', { username: req.flash('username')[0], loginError: req.flash('loginError')[0] });
+  else res.render('users/login', { username: req.flash('username')[0], loginError: req.flash('loginError') });
 });
 
 app.post('/login', function (req, res, next) {
-  req.flash('usrname');
+  req.flash('username');
   if (req.body.username.length === 0 || req.body.password.length === 0) {
     req.flash('username', req.body.username);
     req.flash('loginError', 'No user found');
@@ -93,12 +96,12 @@ app.get('/logout', function (req, res) {
   res.redirect('/');
 });
 
-app.get('/users/new', function (req, res) {
+/*app.get('/users/new', function (req, res) {
   res.render('users/new', {
     formData: req.flash('formData')[0],
     loginError: req.flash('loginError')[0]
   });
-});
+});*/
 
 app.post('/users', checkUserRegValidation, function (req, res, next) {
   User.create(req.body.user), function (err, user) {

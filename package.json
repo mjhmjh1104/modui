@@ -19,6 +19,7 @@
   "homepage": "https://github.com/mjhmjh1104/modui#readme",
   "dependencies": {
     "async": "^3.1.0",
+    "body-parser": "^1.19.0",
     "connect-flash": "^0.1.1",
     "ejs": "^3.0.1",
     "express": "^4.17.1",
