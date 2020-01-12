@@ -12,11 +12,11 @@
               <a href="/"><img src="logo.png" alt="모두이" class="logo"></img></a>
             </div>
             <% loginError.forEach(function (err) { %>
-              <label style="color: #d93025;"><%= err %></label>
+              <label style="color: #d93025;"><%= err %></label><br />
             <% }); %>
             <form class="loginForm" action="/login" method="post" style="margin-top: 20px;">
-              <input type="text" name="username" value="<%= username %>" placeholder="아이디를 입력하세요" autocomplete="username" class="longInput"></input><br></br>
-              <input type="text" name="password" value="" placeholder="비밀번호를 입력하세요" autocomplete="current-password" class="longInput"></input><br></br>
+              <input type="text" name="username" value="<%= username?username:""; %>" placeholder="아이디를 입력하세요" autocomplete="username" class="longInput"></input><br></br>
+              <input type="password" name="password" value="" placeholder="비밀번호를 입력하세요" autocomplete="current-password" class="longInput"></input><br></br>
               <div class="innerContainer" style="position: absolute; width: 100%; bottom: 0;">
                 <div style="position: absolute; bottom: 50px; width: calc(100% - 100px);">
                   <div class="innerContainer" style="position: relative;">

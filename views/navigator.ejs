@@ -10,8 +10,13 @@
   <div class="buttoncontainer">
     <div class="hoverer">
       <div class="navigatorMenu">
-        <a href="/login"><button>로그인</button></a>
-        <a href="/users/new"><button>가입</button></a>
+        <% if (user) { %>
+          <a href="/users/<%= user.username %>"><button><%= user.username %></button></a>
+          <a href="/logout"><button>로그아웃</button></a>
+        <% } else { %>
+          <a href="/login"><button>로그인</button></a>
+          <a href="/users/new"><button>가입</button></a>
+        <% } %>
       </div>
     </div>
   </div>

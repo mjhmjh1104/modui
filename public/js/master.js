@@ -1,20 +1,18 @@
-window.addEventListener('load', ready);
+window.addEventListener('load', init);
 
-function ready() {
+function init() {
   if (/Trident|MSIE/.test(navigator.userAgent)) {
-    alert('IE는 지원하지 않습니다.');
+    alert('IE is not supported.');
     window.close();
     document.getElementsByTagName('html')[0].removeChild(document.getElementsByTagName('head')[0]);
     document.getElementsByTagName('html')[0].removeChild(document.getElementsByTagName('body')[0]);
   }
 }
 
-Array.prototype.forEach.call(
-  document.getElementsByTagName('button'), function(item) {
+Array.prototype.forEach.call(document.getElementsByTagName('button'), function(item) {
   item.addEventListener('mousedown', createRipple);
 });
-Array.prototype.forEach.call(
-  document.getElementsByTagName('textarea'), function(item) {
+Array.prototype.forEach.call(document.getElementsByTagName('textarea'), function(item) {
   item.addEventListener('keyup', autoGrow);
 });
 

@@ -61,7 +61,7 @@ passport.use('local-login',
     User.findOne({ 'username': username }, function (err, user) {
       if (err) return done(err);
       if (!user || user.password != password) {
-        req.flash('username', req.body.nickname);
+        req.flash('username', req.body.username);
         return done(null, false, req.flash('loginError', 'No user found'));
       }
       return done(null, user);
@@ -70,7 +70,7 @@ passport.use('local-login',
 );
 
 app.get('/', function (req, res) {
-  res.render('home');
+  res.render('home', { user: req.user});
 });
 
 app.get('/login', function (req, res) {
@@ -96,29 +96,29 @@ app.get('/logout', function (req, res) {
   res.redirect('/');
 });
 
-/*app.get('/users/new', function (req, res) {
+app.get('/users/new', function (req, res) {
   res.render('users/new', {
     formData: req.flash('formData')[0],
-    loginError: req.flash('loginError')[0]
+    registerError: req.flash('registerError')
   });
-});*/
+});
 
 app.post('/users', checkUserRegValidation, function (req, res, next) {
-  User.create(req.body.user), function (err, user) {
-    if (err) return res.json({ success: false, message: err });
+  User.create(req.body.user, function (err, user) {
+    if (err) return res.render('error', { message: err });
     res.redirect('/login');
-  }
+  });
 });
 
 app.get('/users/:id', function (req, res) {
   User.findById(req.params.id, function (err, user) {
-    if (err) return res.json({ success: false, message: err });
+    if (err) return res.render('error', { message: err });
     res.render('users/show', { user: user });
   });
 });
 
 app.get('/supports', function (req, res) {
-  res.render('supports');
+  res.render('supports', { user: req.user });
 });
 
 app.get('*', function (req, res) {
@@ -132,12 +132,19 @@ app.listen(port, function () {
 
 function checkUserRegValidation(req, res, next) {
   var isValid = true;
-  async.waterfall([function (callback) {
+  if (req.body.user.username.length === 0 || req.body.user.name.length === 0 || req.body.user.email.length === 0 ||
+      req.body.password.length === 0 || req.body.password !== req.body.passwordValidation) {
+    req.flash('registerError', 'Information is not sound');
+    req.flash('formData', req.body.user);
+    return res.redirect('back');
+  }
+  async.waterfall([ function (callback) {
     User.findOne({ username: req.body.user.username, _id: { $ne: mongoose.Types.ObjectId(req.params.id) } }, function (err, user) {
       if (user) {
         isValid = false;
         req.flash('registerError', 'Someone is already using the username');
       }
+      console.log('done1');
       callback(null, isValid);
     });
   }, function (isValid, callback) {
@@ -146,13 +153,16 @@ function checkUserRegValidation(req, res, next) {
         isValid = false;
         req.flash('registerError', 'Someone is already using the email');
       }
+      console.log('done2');
       callback(null, isValid);
     });
-  }], function (err, isValid) {
-    if (err) return res.json({ success: 'false', message: err });
-    if (isValid) return next();
-    else {
-      req.flahs('formData', req.body.user);
+  } ], function (err, isValid) {
+    if (err) return res.render('error', { message: err });
+    if (isValid) {
+      req.body.user['password'] = req.body.password;
+      return next();
+    } else {
+      req.flash('formData', req.body.user);
       res.redirect('back');
     }
   });
